@@ -161,7 +161,20 @@ async function startServer() {
       res.end();
       return;
     }
+
+    // Health check endpoint (no authentication required) - CHECK THIS FIRST!
+    if (req.method === 'GET' && req.url === '/health') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        status: 'healthy',
+        version: '0.0.2',
+        timestamp: timestamp,
+        uptime: Math.floor(process.uptime())
+      }));
+      return;
+    }
     
+    // Authentication check for all other endpoints
     if (key !== secret) {
       console.warn(`[${timestamp}] Unauthorized access attempt with key: ${key ? 'INVALID' : 'MISSING'}`);
       res.writeHead(401, { 'Content-Type': 'application/json' });
@@ -173,18 +186,6 @@ async function startServer() {
     }
 
     // Route handling with enhanced responses
-    if (req.method === 'GET' && req.url === '/health') {
-      // Health check endpoint (no authentication required)
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({
-        status: 'healthy',
-        version: '0.0.2',
-        timestamp: timestamp,
-        uptime: Math.floor(process.uptime())
-      }));
-      return;
-    }
-
     if (req.method === 'POST' && req.url === '/command') {
       let body = '';
       req.on('data', chunk => body += chunk);
@@ -212,6 +213,57 @@ async function startServer() {
           }
           
           console.log(`[${timestamp}] Executing command: ${command} with args:`, args || []);
+          
+          // Special handling for VSCode API calls that aren't commands
+          if (command === 'vscode.window.showInformationMessage') {
+            const result = await vscode.window.showInformationMessage(args?.[0] || 'Message');
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ 
+              result, 
+              timestamp,
+              command,
+              success: true 
+            }));
+            return;
+          }
+          
+          if (command === 'vscode.window.showWarningMessage') {
+            const result = await vscode.window.showWarningMessage(args?.[0] || 'Warning');
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ 
+              result, 
+              timestamp,
+              command,
+              success: true 
+            }));
+            return;
+          }
+          
+          if (command === 'vscode.window.showErrorMessage') {
+            const result = await vscode.window.showErrorMessage(args?.[0] || 'Error');
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ 
+              result, 
+              timestamp,
+              command,
+              success: true 
+            }));
+            return;
+          }
+          
+          if (command === 'vscode.window.showOpenDialog') {
+            const result = await vscode.window.showOpenDialog(args?.[0] || {});
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ 
+              result, 
+              timestamp,
+              command,
+              success: true 
+            }));
+            return;
+          }
+          
+          // Execute as regular VSCode command
           const result = await vscode.commands.executeCommand(command, ...(args || []));
           
           res.writeHead(200, { 'Content-Type': 'application/json' });

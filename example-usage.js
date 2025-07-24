@@ -2,8 +2,9 @@
 // Make sure your .env file contains: VSCODE_API_KEY=your-secret-key
 
 const http = require('http');
+require('dotenv').config();
 
-const API_KEY = 'your-secret-key'; // Should match your .env file
+const API_KEY = process.env.VSCODE_API_KEY;
 const PORT = 8282; // Default port, adjust if changed in settings
 
 // Helper function to make HTTP requests (using built-in http module)

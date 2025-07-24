@@ -3,9 +3,8 @@
 A secure HTTP bridge extension that allows external applications to communicate with VSCode through a local API.
 
 ## Features
-
 - 🔐 **Secure API**: Uses local `.env` file for authentication
-- � **Smart Menu**: Click status bar for a popup menu with options
+- 🧠 **Smart Menu**: Click status bar for a popup menu with options
 - ⚙️ **Configurable**: Customize port and startup settings
 - 🎯 **Command Execution**: Execute any VSCode command remotely
 
