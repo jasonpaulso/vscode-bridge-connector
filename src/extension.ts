@@ -127,10 +127,62 @@ async function startServer() {
   }
 
   server = http.createServer(async (req, res) => {
+    // Enhanced security and error handling
     const key = req.headers['x-vscode-key'];
+    const userAgent = req.headers['user-agent'] || 'Unknown';
+    const timestamp = new Date().toISOString();
+    
+    // Enhanced request logging
+    console.log(`[${timestamp}] ${req.method} ${req.url} - ${userAgent} from ${req.socket.remoteAddress}`);
+    
+    // Content-Length validation for POST requests
+    if (req.method === 'POST') {
+      const contentLength = parseInt(req.headers['content-length'] || '0');
+      if (contentLength > 10000) { // 10KB limit
+        console.warn(`[${timestamp}] Request too large: ${contentLength} bytes`);
+        res.writeHead(413, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ 
+          error: 'Request too large', 
+          message: 'Request body exceeds 10KB limit',
+          timestamp: timestamp
+        }));
+        return;
+      }
+    }
+
+    // CORS headers for cross-origin requests
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-vscode-key');
+
+    // Handle preflight requests
+    if (req.method === 'OPTIONS') {
+      res.writeHead(200);
+      res.end();
+      return;
+    }
+    
     if (key !== secret) {
-      res.writeHead(401);
-      return res.end('Unauthorized');
+      console.warn(`[${timestamp}] Unauthorized access attempt with key: ${key ? 'INVALID' : 'MISSING'}`);
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({
+        error: 'Unauthorized',
+        message: 'Invalid or missing API key',
+        timestamp: timestamp
+      }));
+    }
+
+    // Route handling with enhanced responses
+    if (req.method === 'GET' && req.url === '/health') {
+      // Health check endpoint (no authentication required)
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        status: 'healthy',
+        version: '0.0.2',
+        timestamp: timestamp,
+        uptime: Math.floor(process.uptime())
+      }));
+      return;
     }
 
     if (req.method === 'POST' && req.url === '/command') {
@@ -138,24 +190,95 @@ async function startServer() {
       req.on('data', chunk => body += chunk);
       req.on('end', async () => {
         try {
+          // Enhanced input validation
+          if (!body.trim()) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({
+              error: 'Bad Request',
+              message: 'Empty request body',
+              timestamp: timestamp
+            }));
+          }
+          
           const { command, args } = JSON.parse(body);
+          
+          if (!command || typeof command !== 'string') {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({
+              error: 'Bad Request',
+              message: 'Missing or invalid command field',
+              timestamp: timestamp
+            }));
+          }
+          
+          console.log(`[${timestamp}] Executing command: ${command} with args:`, args || []);
           const result = await vscode.commands.executeCommand(command, ...(args || []));
+          
           res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ result }));
+          res.end(JSON.stringify({ 
+            result, 
+            timestamp,
+            command,
+            success: true 
+          }));
         } catch (err) {
-          res.writeHead(500);
-          res.end(String(err));
+          console.error(`[${timestamp}] Command execution error:`, err);
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ 
+            error: 'Internal Server Error',
+            message: String(err),
+            timestamp,
+            success: false 
+          }));
         }
       });
+      
+      // Handle request timeout
+      req.on('timeout', () => {
+        console.warn(`[${timestamp}] Request timeout`);
+        if (!res.headersSent) {
+          res.writeHead(408, { 'Content-Type': 'text/plain' });
+          res.end('Request Timeout');
+        }
+      });
+      
     } else {
-      res.writeHead(404);
-      res.end('Not Found');
+      // Enhanced 404 response with available routes
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        error: 'Not Found',
+        message: `Route ${req.method} ${req.url} not found`,
+        timestamp: timestamp,
+        availableRoutes: [
+          'GET /health - Health check (no auth required)',
+          'POST /command - Execute VSCode command (requires x-vscode-key header)'
+        ]
+      }));
     }
   });
 
   server.listen(port, '127.0.0.1', () => {
     updateStatus();
+    console.log(`[${new Date().toISOString()}] Bridge Connector started on port ${port}`);
     vscode.window.showInformationMessage(`🔌 Bridge Connector running on port ${port}`);
+  });
+
+  // Enhanced error handling for server
+  server.on('error', (err: any) => {
+    console.error(`[${new Date().toISOString()}] Server error:`, err);
+    if (err.code === 'EADDRINUSE') {
+      vscode.window.showErrorMessage(`🚫 Port ${port} is already in use. Try a different port in settings.`);
+    } else if (err.code === 'EACCES') {
+      vscode.window.showErrorMessage(`🚫 Permission denied on port ${port}. Try a port above 1024.`);
+    } else {
+      vscode.window.showErrorMessage(`🚫 Server error: ${err.message}`);
+    }
+    server = null;
+    updateStatus();
+  });
+
+  server.on('close', () => {
+    console.log(`[${new Date().toISOString()}] Bridge Connector server closed`);
   });
 }
 

@@ -29,6 +29,40 @@ Access settings via Command Palette: `Bridge Connector: Open Settings`
 - `bridgeConnector.port`: Port number (default: 8282)
 - `bridgeConnector.enable`: Auto-start on VSCode launch (default: false)
 
+## API Endpoints
+
+### Health Check (No Authentication Required)
+```http
+GET /health
+```
+
+Returns bridge status without requiring authentication:
+```json
+{
+  "status": "healthy",
+  "version": "0.0.2", 
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "uptime": 3600
+}
+```
+
+### Execute Commands (Authentication Required)
+```http
+POST /command
+```
+
+Headers:
+- `Content-Type: application/json`  
+- `x-vscode-key: your-api-key`
+
+Body:
+```json
+{
+  "command": "vscode.window.showInformationMessage",
+  "args": ["Hello World!"]
+}
+```
+
 ## Usage
 
 ### From External Applications
@@ -77,11 +111,14 @@ const secret = process.env.VSCODE_API_KEY;
 
 ## 🆕 What's New in v0.0.2
 
+- ✅ **Health Check Endpoint**: New `GET /health` endpoint for monitoring (no auth required)
+- ✅ **Enhanced Error Handling**: Better error messages with JSON responses and timestamps  
+- ✅ **Request Validation**: Input validation and 10KB request size limits
+- ✅ **CORS Support**: Cross-origin request handling for web applications
+- ✅ **Improved Logging**: Better request logging with user agent and detailed timestamps
 - ✅ **Fixed CommonJS Issues**: Example scripts now use proper `require()` syntax
 - ✅ **Better Node.js Compatibility**: No more module type warnings
-- ✅ **Easier Testing**: Added `test-client-package.json` for quick setup
-- ✅ **Cleaner Codebase**: Removed unnecessary files, optimized structure
-- ✅ **Improved Documentation**: Better setup and testing instructions
+- ✅ **Security Enhancements**: Better unauthorized access handling and error responses
 
 ## Files in This Package
 

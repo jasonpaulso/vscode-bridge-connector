@@ -1,17 +1,22 @@
-# Exclude files from extension package
+# Security - Never package these
 .env
+.env.*
+!.env.example
+
+# Development files
 .git*
 .vscode/
-*.log
-npm-debug.log*
-.DS_Store
-Thumbs.db
 src/
 tsconfig.json
-SETUP.md
-ICON-INSTRUCTIONS.md
-example-usage.js
-# Ignore build artifacts
-dist/
-out/
+node_modules/
+npm-debug.log*
+*.log
+
+# Test and build files
+test-client-package.json
 *.vsix
+*.vsix.bak
+.vscodeignore.bak
+
+# Documentation (keep essential ones)
+SETUP.md
