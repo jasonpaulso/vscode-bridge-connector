@@ -34,10 +34,10 @@ Access settings via Command Palette: `Bridge Connector: Open Settings`
 ### From External Applications
 
 ```javascript
-// Example external usage (in your project code)
-import fetch from 'node-fetch';
-import { config } from 'dotenv';
-config();
+// Example external usage (CommonJS - works with Node.js)
+// First install: npm install node-fetch@2.7.0 dotenv
+const fetch = require('node-fetch');
+require('dotenv').config();
 
 const secret = process.env.VSCODE_API_KEY;
 
@@ -74,6 +74,21 @@ const secret = process.env.VSCODE_API_KEY;
 - `Bridge Connector: Show Menu` - Open the Bridge Connector popup menu
 - `Bridge Connector: Toggle` - Start/stop the bridge directly
 - `Bridge Connector: Open Settings` - Open extension settings
+
+## 🆕 What's New in v0.0.2
+
+- ✅ **Fixed CommonJS Issues**: Example scripts now use proper `require()` syntax
+- ✅ **Better Node.js Compatibility**: No more module type warnings
+- ✅ **Easier Testing**: Added `test-client-package.json` for quick setup
+- ✅ **Cleaner Codebase**: Removed unnecessary files, optimized structure
+- ✅ **Improved Documentation**: Better setup and testing instructions
+
+## Files in This Package
+
+- `example-usage.js` - Working CommonJS example script
+- `test-client-package.json` - Quick test setup configuration
+- `.env.example` - Environment variable template
+- `icon.png` - Extension icon (128x128)
 
 ## Author
 

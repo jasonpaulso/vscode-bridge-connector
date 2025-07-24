@@ -12,7 +12,8 @@
    ```
 
 2. **Build the Extension**
-   ```powershell
+   ```shell
+   # Install dependencies
    npm install
    npm run build
    ```
@@ -20,12 +21,26 @@
 3. **Test the Extension**
    - Press `F5` in VSCode to launch Extension Development Host
    - Look for "Bridge: Stopped" in the bottom-right status bar
-   - Click it to start the bridge (it will read from your .env file)
+   - Click it to open the popup menu and start the bridge
 
 4. **Test External API**
    ```powershell
-   # Make sure your external project also has the same API key
+   # The example script now uses CommonJS (require) for better Node.js compatibility
    node example-usage.js
+   ```
+
+## 🧪 **Alternative Test Setup**
+
+For testing in a separate project directory:
+
+1. **Quick test setup**:
+   ```bash
+   mkdir bridge-test && cd bridge-test
+   cp ../test-client-package.json package.json
+   npm install
+   echo "VSCODE_API_KEY=your-secret-key-here" > .env
+   cp ../example-usage.js test.js
+   node test.js
    ```
 
 ## 📁 Project Structure
@@ -39,9 +54,18 @@ vscode-bridge-connector/
 ├── package.json              # Extension manifest
 ├── tsconfig.json            # TypeScript config
 ├── README.md                # Documentation
-├── example-usage.js         # Usage example
+├── example-usage.js         # Working CommonJS example
+├── test-client-package.json # Test setup helper
+├── .env.example             # Environment template
+├── .vscodeignore            # Package exclusions
 └── SETUP.md                 # This file
 ```
+
+## 🔧 **New in v0.0.2:**
+- ✅ Fixed CommonJS compatibility in example-usage.js
+- ✅ Added test-client-package.json for easier testing
+- ✅ Cleaner project structure
+- ✅ Better Node.js compatibility
 
 ## 🔧 Configuration
 

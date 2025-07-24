@@ -1,5 +1,7 @@
 // Example external usage (in your project code)
 const fetch = require('node-fetch');
+require('dotenv').config();
+
 const secret = process.env.VSCODE_API_KEY;
 
 (async () => {
@@ -10,8 +12,8 @@ const secret = process.env.VSCODE_API_KEY;
       'x-vscode-key': secret
     },
     body: JSON.stringify({
-      command: 'editor.action.insertLineAfter',
-      args: []
+      command: 'workbench.action.chat.open',
+      args: ["Hello, can you help me with my code?"]    
     })
   });
 

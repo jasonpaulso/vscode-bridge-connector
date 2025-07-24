@@ -11,3 +11,7 @@ tsconfig.json
 SETUP.md
 ICON-INSTRUCTIONS.md
 example-usage.js
+# Ignore build artifacts
+dist/
+out/
+*.vsix
