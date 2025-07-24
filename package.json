@@ -1,0 +1,81 @@
+{
+  "name": "vscode-bridge-connector",
+  "displayName": "VSCode Bridge Connector 🔌🌉",
+  "publisher": "yourPublisher",
+  "version": "0.0.1",
+  "author": {
+    "name": "Eric Lee",
+    "email": "hello@1wayto.com"
+  },
+  "description": "A secure HTTP bridge for external applications to communicate with VSCode",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/1wayto/vscode-bridge-connector.git"
+  },
+  "bugs": {
+    "url": "https://github.com/1wayto/vscode-bridge-connector/issues"
+  },
+  "homepage": "https://github.com/1wayto/vscode-bridge-connector#readme",
+  "license": "MIT",
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#1e1e1e",
+    "theme": "dark"
+  },
+  "categories": ["Other"],
+  "keywords": ["bridge", "api", "connector", "automation", "http", "remote", "command"],
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "activationEvents": ["*"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "🔧 Bridge Connector Settings",
+      "properties": {
+        "bridgeConnector.port": {
+          "type": "number",
+          "default": 8282,
+          "description": "Port for the local HTTP bridge (default: 8282) 🛡️"
+        },
+        "bridgeConnector.enable": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable the local API bridge on startup 🚀"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "bridgeConnector.showMenu",
+        "title": "Show Bridge Connector Menu",
+        "category": "Bridge Connector"
+      },
+      {
+        "command": "bridgeConnector.toggle",
+        "title": "Toggle Bridge Connector",
+        "category": "Bridge Connector"
+      },
+      {
+        "command": "bridgeConnector.openSettings",
+        "title": "Open Bridge Connector Settings",
+        "category": "Bridge Connector"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run build",
+    "test": "node ./out/test/runTest.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.60.0",
+    "@types/node": "^16.x",
+    "typescript": "^4.9.4"
+  }
+}
