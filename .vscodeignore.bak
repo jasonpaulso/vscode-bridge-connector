@@ -1,9 +1,0 @@
-# Minimal exclusions for extension package
-.env
-.git*
-src/
-tsconfig.json
-node_modules/
-test-client-package.json
-out/
-*.vsix
