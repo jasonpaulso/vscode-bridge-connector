@@ -63,7 +63,7 @@ export function activate(context: vscode.ExtensionContext) {
         case 'settings':
           vscode.commands.executeCommand(
             'workbench.action.openSettings',
-            '@ext:yourPublisher.vscode-bridge-connector'
+            '@ext:1WAYTO.vscode-bridge-connector'
           );
           break;
       }
@@ -76,7 +76,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('bridgeConnector.openSettings', () => {
       vscode.commands.executeCommand(
         'workbench.action.openSettings',
-        '@ext:yourPublisher.vscode-bridge-connector'
+        '@ext:1WAYTO.vscode-bridge-connector'
       );
     })
   );

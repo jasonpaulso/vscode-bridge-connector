@@ -1,0 +1,13 @@
+# Exclude files from extension package
+.env
+.git*
+.vscode/
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+src/
+tsconfig.json
+SETUP.md
+ICON-INSTRUCTIONS.md
+example-usage.js
