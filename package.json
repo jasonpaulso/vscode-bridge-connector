@@ -54,6 +54,11 @@
           "type": "boolean",
           "default": false,
           "description": "Enable the local API bridge on startup 🚀"
+        },
+        "bridgeConnector.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API key for the local API bridge (leave empty for no authentication) 🔑"
         }
       }
     },
